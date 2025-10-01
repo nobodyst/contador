@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Tiempo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            color: #333;
+        }
+        #counter {
+            font-size: 5em; /* Tamaño grande para que sea fácil de ver */
+            font-weight: bold;
+            padding: 20px 40px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="counter">Cargando...</div>
+
+    <script>
+        // Establecemos el tiempo inicial en segundos: 0 horas y 0 minutos
+        let totalSeconds = 0; // ¡Aquí está el cambio!
+
+        function updateCounter() {
+            totalSeconds++; // Incrementamos el contador por cada segundo
+            
+            // Calculamos horas, minutos y segundos a partir de totalSeconds
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            // Formateamos los números para que siempre tengan dos dígitos (ej: 00:00:01)
+            hours = String(hours).padStart(2, '0');
+            minutes = String(minutes).padStart(2, '0');
+            seconds = String(seconds).padStart(2, '0');
+
+            // Actualizamos el contenido del div con el ID "counter"
+            document.getElementById('counter').innerText = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Llamamos a updateCounter una vez de inmediato para mostrar el tiempo inicial
+        updateCounter();
+
+        // Actualizamos el contador cada 1000 milisegundos (cada segundo)
+        setInterval(updateCounter, 1000);
+    </script>
+</body>
+</html>
