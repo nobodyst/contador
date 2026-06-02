@@ -5,55 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contador de Tiempo</title>
     <style>
+        /* Estilos básicos para que se vea ordenado y grande en pantalla */
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
+            height: 100vh;
             margin: 0;
-            color: #333;
+            background-color: #111;
+            color: #fff;
         }
-        #counter {
-            font-size: 5em; /* Tamaño grande para que sea fácil de ver */
+        .contador-contenedor {
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #888;
+        }
+        #tiempo {
+            font-size: 5rem;
             font-weight: bold;
-            padding: 20px 40px;
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: monospace;
+            background: #222;
+            padding: 10px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body>
-    <div id="counter">Cargando...</div>
+
+    <div class="contador-contenedor">
+        <h1>Tiempo Transcurrido</h1>
+        <div id="tiempo">31:20:00</div>
+    </div>
 
     <script>
-        // Establecemos el tiempo inicial en segundos: 0 horas y 0 minutos
-        let totalSeconds = 0; // ¡Aquí está el cambio!
+        // Configura aquí el tiempo donde quieres que empiece
+        let horas = 31;
+        let minutos = 20;
+        let segundos = 0;
 
-        function updateCounter() {
-            totalSeconds++; // Incrementamos el contador por cada segundo
-            
-            // Calculamos horas, minutos y segundos a partir de totalSeconds
-            let hours = Math.floor(totalSeconds / 3600);
-            let minutes = Math.floor((totalSeconds % 3600) / 60);
-            let seconds = totalSeconds % 60;
+        function actualizarContador() {
+            segundos++; // Suma un segundo
 
-            // Formateamos los números para que siempre tengan dos dígitos (ej: 00:00:01)
-            hours = String(hours).padStart(2, '0');
-            minutes = String(minutes).padStart(2, '0');
-            seconds = String(seconds).padStart(2, '0');
+            if (segundos >= 60) {
+                segundos = 0;
+                minutos++;
+            }
+            if (minutos >= 60) {
+                minutos = 0;
+                horas++;
+            }
 
-            // Actualizamos el contenido del div con el ID "counter"
-            document.getElementById('counter').innerText = `${hours}:${minutes}:${seconds}`;
+            // Esto acomoda los números para que siempre tengan dos dígitos (ej: "05" en vez de "5")
+            let hrsFormateadas = horas.toString().padStart(2, '0');
+            let minsFormateados = minutos.toString().padStart(2, '0');
+            let segsFormateados = segundos.toString().padStart(2, '0');
+
+            // Muestra el resultado en la pantalla
+            document.getElementById("tiempo").innerText = `${hrsFormateadas}:${minsFormateados}:${segsFormateados}`;
         }
 
-        // Llamamos a updateCounter una vez de inmediato para mostrar el tiempo inicial
-        updateCounter();
-
-        // Actualizamos el contador cada 1000 milisegundos (cada segundo)
-        setInterval(updateCounter, 1000);
+        // Ejecuta la función cada 1 segundo (1000 milisegundos)
+        setInterval(actualizarContador, 1000);
     </script>
+
 </body>
 </html>
