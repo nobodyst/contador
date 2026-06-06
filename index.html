@@ -38,13 +38,13 @@
 
     <div class="contador-contenedor">
         <h1>Tiempo Transcurrido</h1>
-        <div id="tiempo">118:30:00</div>
+        <div id="tiempo">130:10:00</div>
     </div>
 
     <script>
-        // AQUÍ SE CAMBIARON LOS VALORES:
-        let horas = 118;
-        let minutos = 30;
+        // VALORES ACTUALIZADOS AQUÍ:
+        let horas = 130;
+        let minutes = 10;
         let segundos = 0;
 
         function actualizarContador() {
@@ -52,15 +52,15 @@
 
             if (segundos >= 60) {
                 segundos = 0;
-                minutos++;
+                minutes++;
             }
-            if (minutos >= 60) {
-                minutos = 0;
+            if (minutes >= 60) {
+                minutes = 0;
                 horas++;
             }
 
             let hrsFormateadas = horas.toString().padStart(2, '0');
-            let minsFormateados = minutos.toString().padStart(2, '0');
+            let minsFormateados = minutes.toString().padStart(2, '0');
             let segsFormateados = segundos.toString().padStart(2, '0');
 
             document.getElementById("tiempo").innerText = `${hrsFormateadas}:${minsFormateados}:${segsFormateados}`;
