@@ -3,71 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador de Tiempo</title>
+    <title>Contador Retro Stream</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
     <style>
+        /* 2. ESTILOS CSS CON LA FUENTE RETRO APLICADA */
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: transparent; /* Fondo transparente ideal para OBS */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: #111;
-            color: #fff;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive; /* Aplicamos la fuente a todo */
+            color: #ffffff;
         }
-        .contador-contenedor {
+
+        /* Contenedor del contador con estética Pixel Art */
+        .contador-container {
             text-align: center;
+            background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro semitransparente */
+            padding: 25px 35px;
+            border: 4px solid #ffffff;
+            border-radius: 2px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.6);
         }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            color: #888;
+
+        /* Estilo y tamaño de los números del contador */
+        .tiempo {
+            font-size: 36px; /* Tamaño grande y legible */
+            letter-spacing: 2px;
+            color: #00ffcc; /* Color cian estilo neón retro */
+            text-shadow: 3px 3px 0px #000000;
+            margin-bottom: 15px;
         }
-        #tiempo {
-            font-size: 5rem;
-            font-weight: bold;
-            font-family: monospace;
-            background: #222;
-            padding: 10px 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+
+        /* Botones de control (Por si necesitas interactuar con ellos) */
+        .controles {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
+
+        button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #000000;
+            border: 2px solid #000000;
+            box-shadow: 2px 2px 0px #888888;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px #888888;
+        }
+
+        button.btn-start { background-color: #2ecc71; color: white; }
+        button.btn-pause { background-color: #e74c3c; color: white; }
+        button.btn-reset { background-color: #f1c40f; color: black; }
     </style>
 </head>
 <body>
 
-    <div class="contador-contenedor">
-        <h1>Tiempo Transcurrido</h1>
-        <div id="tiempo">130:10:00</div>
+    <div class="contador-container">
+        <div class="tiempo" id="display-tiempo">00:00:00</div>
+        
+        <div class="controles">
+            <button class="btn-start" onclick="iniciarContador()">START</button>
+            <button class="btn-pause" onclick="pausarContador()">PAUSE</button>
+            <button class="btn-reset" onclick="reiniciarContador()">RESET</button>
+        </div>
     </div>
 
     <script>
-        // VALORES ACTUALIZADOS AQUÍ:
-        let horas = 130;
-        let minutes = 10;
-        let segundos = 0;
+        // Forzamos la eliminación de cualquier caché antigua que tuviera las 130 horas guardadas
+        localStorage.removeItem('contador_tiempo_guardado');
 
-        function actualizarContador() {
-            segundos++; 
+        let totalSegundos = 0; // REINICIADO A 0 SEGUNDOS DE FORMA PRESETEADA
+        let intervalo = null;
+        let enEjecucion = false;
 
-            if (segundos >= 60) {
-                segundos = 0;
-                minutes++;
-            }
-            if (minutes >= 60) {
-                minutes = 0;
-                horas++;
-            }
+        const displayTiempo = document.getElementById('display-tiempo');
 
-            let hrsFormateadas = horas.toString().padStart(2, '0');
-            let minsFormateados = minutes.toString().padStart(2, '0');
-            let segsFormateados = segundos.toString().padStart(2, '0');
+        // Convierte los segundos totales a formato legible HH:MM:SS
+        function actualizarDisplay() {
+            let horas = Math.floor(totalSegundos / 3600);
+            let minutos = Math.floor((totalSegundos % 3600) / 60);
+            let segundos = totalSegundos % 60;
 
-            document.getElementById("tiempo").innerText = `${hrsFormateadas}:${minsFormateados}:${segsFormateados}`;
+            // Agrega un cero a la izquierda si el número es menor a 10
+            let hrsTexto = horas.toString().padStart(2, '0');
+            let minTexto = minutos.toString().padStart(2, '0');
+            let segTexto = segundos.toString().padStart(2, '0');
+
+            displayTiempo.innerText = `${hrsTexto}:${minTexto}:${segTexto}`;
         }
 
-        setInterval(actualizarContador, 1000);
-    </script>
+        // Incrementa el tiempo segundo a segundo
+        function temporizador() {
+            totalSegundos++;
+            actualizarDisplay();
+            // Guarda el progreso actual por si se recarga la página o el stream por error
+            localStorage.setItem('contador_tiempo_guardado', totalSegundos);
+        }
 
+        function iniciarContador() {
+            if (!enEjecucion) {
+                enEjecucion = true;
+                intervalo = setInterval(temporizador, 1000);
+            }
+        }
+
+        function pausarContador() {
+            clearInterval(intervalo);
+            enEjecucion = false;
+        }
+
+        function reiniciarContador() {
+            clearInterval(intervalo);
+            enEjecucion = false;
+            totalSegundos = 0;
+            localStorage.removeItem('contador_tiempo_guardado');
+            actualizarDisplay();
+        }
+
+        // Al cargar la página, comprueba si hay un contador limpio en ejecución
+        const cacheTiempo = localStorage.getItem('contador_tiempo_guardado');
+        if (cacheTiempo !== null) {
+            totalSegundos = parseInt(cacheTiempo, 10);
+        } else {
+            totalSegundos = 0;
+        }
+
+        // Renderizado e inicio automático del contador al abrirse
+        actualizarDisplay();
+        iniciarContador(); 
+    </script>
 </body>
 </html>
