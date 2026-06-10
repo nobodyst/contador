@@ -1,90 +1,84 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador Retro</title>
-    
-    <!-- IMPORTACIÓN DE LA FUENTE "PRESS START 2P" -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
-    <style>
-        /* CONFIGURACIÓN DEL FONDO BLANCO Y CENTRADO */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff; /* Fondo completamente blanco */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Press Start 2P', cursive;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contador Retro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* NÚMEROS NEGROS CON CONTORNO BLANCO ESTILO PIXEL */
-        .tiempo {
-            font-size: 48px;
-            color: #000000; /* Letras negras */
-            letter-spacing: 2px;
-            user-select: none;
-            
-            /* Contorno blanco sólido en 8 direcciones para mantener el aspecto pixelado */
-            text-shadow: 
-                -3px -3px 0 #ffffff,  
-                 0px -3px 0 #ffffff,  
-                 3px -3px 0 #ffffff,  
-                 3px  0px 0 #ffffff,  
-                 3px  3px 0 #ffffff,  
-                 0px  3px 0 #ffffff,  
-                -3px  3px 0 #ffffff,  
-                -3px  0px 0 #ffffff;
-        }
-    </style>
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    #contador {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(2rem, 8vw, 5rem);
+      color: #ffffff;
+      text-shadow:
+        -3px -3px 0 #000,  3px -3px 0 #000,
+        -3px  3px 0 #000,  3px  3px 0 #000,
+        -3px  0   0 #000,  3px  0   0 #000,
+         0   -3px 0 #000,  0    3px 0 #000;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes hora {
+      0%   { transform: scale(1);    color: #ffffff; }
+      15%  { transform: scale(1.18); color: #ffe066;
+             text-shadow:
+               -3px -3px 0 #000,  3px -3px 0 #000,
+               -3px  3px 0 #000,  3px  3px 0 #000,
+               -3px  0   0 #000,  3px  0   0 #000,
+                0   -3px 0 #000,  0    3px 0 #000; }
+      30%  { transform: scale(1);    color: #ffffff; }
+      45%  { transform: scale(1.10); color: #ffe066; }
+      60%  { transform: scale(1);    color: #ffffff;
+             text-shadow:
+               -3px -3px 0 #000,  3px -3px 0 #000,
+               -3px  3px 0 #000,  3px  3px 0 #000,
+               -3px  0   0 #000,  3px  0   0 #000,
+                0   -3px 0 #000,  0    3px 0 #000; }
+    }
+
+    .celebrar {
+      animation: hora 1.4s ease-in-out;
+    }
+  </style>
 </head>
 <body>
+  <div id="contador">00:00:00</div>
 
-    <!-- Contenedor único del tiempo -->
-    <div class="tiempo" id="display-tiempo">00:00:00</div>
+  <script>
+    let totalSegundos = 0;
+    const el = document.getElementById('contador');
 
-    <script>
-        // Limpiamos cualquier rastro en el navegador de las 130 horas antiguas
-        localStorage.removeItem('contador_puro_segundos');
+    function formatear(n) {
+      return String(n).padStart(2, '0');
+    }
 
-        let totalSegundos = 0; // El contador inicia estrictamente en 0
-        const displayTiempo = document.getElementById('display-tiempo');
+    function actualizar() {
+      totalSegundos++;
+      const horas    = Math.floor(totalSegundos / 3600);
+      const minutos  = Math.floor((totalSegundos % 3600) / 60);
+      const segundos = totalSegundos % 60;
 
-        // Convierte los segundos a formato HH:MM:SS
-        function actualizarContador() {
-            let horas = Math.floor(totalSegundos / 3600);
-            let minutos = Math.floor((totalSegundos % 3600) / 60);
-            let segundos = totalSegundos % 60;
+      el.textContent = formatear(horas) + ':' + formatear(minutos) + ':' + formatear(segundos);
 
-            let hrsTexto = horas.toString().padStart(2, '0');
-            let minTexto = minutos.toString().padStart(2, '0');
-            let segTexto = segundos.toString().padStart(2, '0');
+      if (totalSegundos % 3600 === 0) {
+        el.classList.remove('celebrar');
+        void el.offsetWidth;
+        el.classList.add('celebrar');
+        el.addEventListener('animationend', () => el.classList.remove('celebrar'), { once: true });
+      }
+    }
 
-            displayTiempo.innerText = `${hrsTexto}:${minTexto}:${segTexto}`;
-        }
-
-        // Incrementa de 1 en 1 segundo sin parar
-        function incrementar() {
-            totalSegundos++;
-            actualizarContador();
-            localStorage.setItem('contador_puro_segundos', totalSegundos);
-        }
-
-        // Revisa si hay progreso guardado de esta nueva sesión limpia o empieza de cero
-        const tiempoGuardado = localStorage.getItem('contador_puro_segundos');
-        if (tiempoGuardado !== null) {
-            totalSegundos = parseInt(tiempoGuardado, 10);
-        } else {
-            totalSegundos = 0;
-        }
-
-        // Inicializa la pantalla y arranca el bucle infinito automático
-        actualizarContador();
-        setInterval(incrementar, 1000);
-    </script>
+    setInterval(actualizar, 1000);
+  </script>
 </body>
 </html>
