@@ -1,9 +1,13 @@
+Aquí tienes el código actualizado. Le he añadido un contorno (borde) de color blanco alrededor de los números negros utilizando la propiedad text-shadow optimizada para fuentes pixeladas, de modo que se note claramente sobre cualquier fondo oscuro si es necesario, manteniendo el fondo de la página en blanco como me pediste.
+
+Código Completo (index.html)
+HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador Minimalista Retro</title>
+    <title>Contador Retro con Contorno</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     
@@ -21,12 +25,23 @@
             font-family: 'Press Start 2P', cursive;
         }
 
-        /* ESTILO DE LOS NÚMEROS (COLOR NEGRO) */
+        /* ESTILO DE LOS NÚMEROS (NEGROS CON CONTORNO BLANCO) */
         .tiempo {
-            font-size: 48px; /* Tamaño grande y claro */
+            font-size: 48px;
             color: #000000; /* Números negros */
             letter-spacing: 2px;
-            user-select: none; /* Evita que se seleccione el texto por error */
+            user-select: none;
+            
+            /* CONTORNO BLANCO EN 8 DIRECCIONES (Efecto Pixel Art Perfecto) */
+            text-shadow: 
+                -3px -3px 0 #ffffff,  
+                 0px -3px 0 #ffffff,  
+                 3px -3px 0 #ffffff,  
+                 3px  0px 0 #ffffff,  
+                 3px  3px 0 #ffffff,  
+                 0px  3px 0 #ffffff,  
+                -3px  3px 0 #ffffff,  
+                -3px  0px 0 #ffffff;
         }
     </style>
 </head>
@@ -35,34 +50,30 @@
     <div class="tiempo" id="display-tiempo">00:00:00</div>
 
     <script>
-        // Forzamos limpiar cualquier rastro del antiguo contador de 130 horas
-        localStorage.removeItem('contador_puro_segundos');
-
         let totalSegundos = 0;
         const displayTiempo = document.getElementById('display-tiempo');
 
         // Función que transforma los segundos en formato HH:MM:SS
         function actualizarContador() {
             let horas = Math.floor(totalSegundos / 3600);
-            let minutos = Math.floor((totalSegundos % 3600) / 60);
+            let minutes = Math.floor((totalSegundos % 3600) / 60);
             let segundos = totalSegundos % 60;
 
-            // Asegura que siempre se muestren 2 dígitos (ej: 05 en vez de 5)
             let hrsTexto = horas.toString().padStart(2, '0');
-            let minTexto = minutos.toString().padStart(2, '0');
+            let minTexto = minutes.toString().padStart(2, '0');
             let segTexto = segundos.toString().padStart(2, '0');
 
             displayTiempo.innerText = `${hrsTexto}:${minTexto}:${segTexto}`;
         }
 
-        // Función que suma un segundo e incrementa sin parar
+        // Función que suma un segundo de manera continua
         function incrementar() {
             totalSegundos++;
             actualizarContador();
             localStorage.setItem('contador_puro_segundos', totalSegundos);
         }
 
-        // Recupera el tiempo si se recarga la página para que no pierda el progreso, o inicia en 0
+        // Recupera el progreso guardado o inicia en cero
         const tiempoGuardado = localStorage.getItem('contador_puro_segundos');
         if (tiempoGuardado !== null) {
             totalSegundos = parseInt(tiempoGuardado, 10);
@@ -70,10 +81,9 @@
             totalSegundos = 0;
         }
 
-        // Muestra el estado inicial
         actualizarContador();
 
-        // Inicia el bucle infinito: suma 1 segundo cada 1000 milisegundos
+        // Ejecución infinita cada 1 segundo
         setInterval(incrementar, 1000);
     </script>
 </body>
