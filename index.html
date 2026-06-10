@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador Retro con Contorno</title>
+    <title>Contador Retro</title>
     
+    <!-- IMPORTACIÓN DE LA FUENTE "PRESS START 2P" -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <style>
-        /* ESTILOS DE LA PÁGINA (FONDO BLANCO Y CENTRADO) */
+        /* CONFIGURACIÓN DEL FONDO BLANCO Y CENTRADO */
         body {
             margin: 0;
             padding: 0;
-            background-color: #ffffff; /* Fondo blanco */
+            background-color: #ffffff; /* Fondo completamente blanco */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -21,14 +22,14 @@
             font-family: 'Press Start 2P', cursive;
         }
 
-        /* ESTILO DE LOS NÚMEROS (NEGROS CON CONTORNO BLANCO) */
+        /* NÚMEROS NEGROS CON CONTORNO BLANCO ESTILO PIXEL */
         .tiempo {
             font-size: 48px;
-            color: #000000; /* Números negros */
+            color: #000000; /* Letras negras */
             letter-spacing: 2px;
             user-select: none;
             
-            /* CONTORNO BLANCO EN 8 DIRECCIONES (Efecto Pixel Art Perfecto) */
+            /* Contorno blanco sólido en 8 direcciones para mantener el aspecto pixelado */
             text-shadow: 
                 -3px -3px 0 #ffffff,  
                  0px -3px 0 #ffffff,  
@@ -43,33 +44,37 @@
 </head>
 <body>
 
+    <!-- Contenedor único del tiempo -->
     <div class="tiempo" id="display-tiempo">00:00:00</div>
 
     <script>
-        let totalSegundos = 0;
+        // Limpiamos cualquier rastro en el navegador de las 130 horas antiguas
+        localStorage.removeItem('contador_puro_segundos');
+
+        let totalSegundos = 0; // El contador inicia estrictamente en 0
         const displayTiempo = document.getElementById('display-tiempo');
 
-        // Función que transforma los segundos en formato HH:MM:SS
+        // Convierte los segundos a formato HH:MM:SS
         function actualizarContador() {
             let horas = Math.floor(totalSegundos / 3600);
-            let minutes = Math.floor((totalSegundos % 3600) / 60);
+            let minutos = Math.floor((totalSegundos % 3600) / 60);
             let segundos = totalSegundos % 60;
 
             let hrsTexto = horas.toString().padStart(2, '0');
-            let minTexto = minutes.toString().padStart(2, '0');
+            let minTexto = minutos.toString().padStart(2, '0');
             let segTexto = segundos.toString().padStart(2, '0');
 
             displayTiempo.innerText = `${hrsTexto}:${minTexto}:${segTexto}`;
         }
 
-        // Función que suma un segundo de manera continua
+        // Incrementa de 1 en 1 segundo sin parar
         function incrementar() {
             totalSegundos++;
             actualizarContador();
             localStorage.setItem('contador_puro_segundos', totalSegundos);
         }
 
-        // Recupera el progreso guardado o inicia en cero
+        // Revisa si hay progreso guardado de esta nueva sesión limpia o empieza de cero
         const tiempoGuardado = localStorage.getItem('contador_puro_segundos');
         if (tiempoGuardado !== null) {
             totalSegundos = parseInt(tiempoGuardado, 10);
@@ -77,9 +82,8 @@
             totalSegundos = 0;
         }
 
+        // Inicializa la pantalla y arranca el bucle infinito automático
         actualizarContador();
-
-        // Ejecución infinita cada 1 segundo
         setInterval(incrementar, 1000);
     </script>
 </body>
